@@ -7,21 +7,13 @@ import (
 	"github.com/nadeem-baig/go-auth/middleware"
 )
 
-// NewHandler initializes a new router with defined routes.
-func NewHandler() *config.Handler {
+// NewHandler initializes a new router with defined routes for user service.
+func NewHandler(h *config.Handler) http.Handler {
 	mux := http.NewServeMux()
-	handler := &config.Handler{Mux: mux}
 
-	// Create a sub-router for /api/v1
-	apiV1 := http.NewServeMux()
+	mux.HandleFunc("/", middleware.LoggingMiddleware(HomeHandler(h)))
+	mux.HandleFunc("/login", middleware.LoggingMiddleware(GreetHandler(h)))
+	mux.HandleFunc("/register", middleware.LoggingMiddleware(PostHandler(h)))
 
-	// Define routes for the sub-router
-	apiV1.HandleFunc("GET /", middleware.LoggingMiddleware(HomeHandler))
-	apiV1.HandleFunc("GET /login", middleware.LoggingMiddleware(GreetHandler))
-	apiV1.HandleFunc("POST /register", middleware.LoggingMiddleware(PostHandler))
-
-	// Mount the sub-router under /api/v1 for all HTTP methods
-	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", apiV1))
-
-	return handler
+	return mux
 }
