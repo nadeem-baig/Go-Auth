@@ -11,8 +11,8 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/nadeem-baig/go-auth/config"
 	"github.com/nadeem-baig/go-auth/service/user"
-	"github.com/nadeem-baig/go-auth/service/post"
-	"github.com/nadeem-baig/go-auth/service/payment"
+	// "github.com/nadeem-baig/go-auth/service/post"
+	// "github.com/nadeem-baig/go-auth/service/payment"
 )
 
 // StartServer sets up the HTTP server configurations.
@@ -26,14 +26,14 @@ func StartServer(db *sql.DB) {
 	mainHandler := config.NewHandler(db)
 
 	// Initialize service handlers
-	userHandler := user.NewHandler(mainHandler)
-	postHandler := post.NewHandler(mainHandler)
-	paymentHandler := payment.NewHandler(mainHandler)
+	userAuthHandler := user.NewHandler(mainHandler)
+	// postHandler := post.NewHandler(mainHandler)
+	// paymentHandler := payment.NewHandler(mainHandler)
 
 	// Mount service handlers
-	mainHandler.Mux.Handle("/api/v1/users/", http.StripPrefix("/api/v1/users", userHandler))
-	mainHandler.Mux.Handle("/api/v1/posts/", http.StripPrefix("/api/v1/posts", postHandler))
-	mainHandler.Mux.Handle("/api/v1/payments/", http.StripPrefix("/api/v1/payments", paymentHandler))
+	mainHandler.Mux.Handle("/api/v1/users/auth/", http.StripPrefix("/api/v1/users/auth", userAuthHandler))
+	// mainHandler.Mux.Handle("/api/v1/posts/", http.StripPrefix("/api/v1/posts", postHandler))
+	// mainHandler.Mux.Handle("/api/v1/payments/", http.StripPrefix("/api/v1/payments", paymentHandler))
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%s", port),

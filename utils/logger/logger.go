@@ -1,6 +1,9 @@
 package logger
 
-import "log"
+import (
+	"fmt"
+	"log"
+)
 
 // Fatal logs a fatal error and exits the program if any argument is non-nil
 func Fatal(args ...interface{}) {
@@ -12,7 +15,9 @@ func Fatal(args ...interface{}) {
 }
 
 func Println(msg string)  {
-    log.Println("Starting the Go HTTP server...")
-	
+    log.Println(msg)
 }
 
+func Errorf(msg string) error {
+    return fmt.Errorf(msg)
+}

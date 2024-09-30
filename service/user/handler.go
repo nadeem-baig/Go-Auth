@@ -1,12 +1,14 @@
 package user
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/nadeem-baig/go-auth/config"
+	"github.com/nadeem-baig/go-auth/service/auth"
+	"github.com/nadeem-baig/go-auth/types"
 	"github.com/nadeem-baig/go-auth/utils"
+	"github.com/nadeem-baig/go-auth/utils/logger"
 )
 
 // HomeHandler responds with a welcome message.
@@ -27,21 +29,42 @@ func GreetHandler(h *config.Handler) http.HandlerFunc {
 	}
 }
 
-// PostHandler processes JSON input data and responds.
-func PostHandler(h *config.Handler) http.HandlerFunc {
+// RegisterHandler processes JSON input data and responds.
+func RegisterHandler(h *config.Handler, store UserStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			utils.JSONResponse(w, config.Response{Message: "Method not allowed"}, http.StatusMethodNotAllowed)
+		var payload types.RegisterUserPayload
+
+		// Validate and parse JSON request payload
+		if err := utils.ParseJson(r, &payload); err != nil {
+			utils.JSONResponse(w, config.Response{Message: err.Error()}, http.StatusBadRequest)
 			return
 		}
-
-		var data map[string]string
-		err := json.NewDecoder(r.Body).Decode(&data)
-		if err != nil {
-			utils.JSONResponse(w, config.Response{Message: "Invalid JSON data"}, http.StatusBadRequest)
+		// validate payload
+		if err := utils.Validate.Struct(payload); err != nil {
+			utils.JSONResponse(w, config.Response{Message: err.Error()}, http.StatusBadRequest)
+            return
+		}
+		// check if user exists
+		_, err := store.GetUserByEmail(payload.Email)
+		if err == nil {
+			utils.JSONResponse(w, config.Response{Message: "User already exists"}, http.StatusConflict)
 			return
 		}
-
-		utils.JSONResponse(w, config.Response{Message: fmt.Sprintf("Received data: %v", data)}, http.StatusOK)
+		hashedPassword,err := auth.HashPassword(payload.Password)
+		if err != nil  {
+			logger.Errorf("Failed to hash password")
+		}
+		// create user
+		user := types.User{
+            FirstName: payload.FirstName,
+            LastName:  payload.LastName,
+            Email:     payload.Email,
+            Password: hashedPassword,
+        }
+        if err := store.CreateUser(user); err!= nil {
+            utils.JSONResponse(w, config.Response{Message: err.Error()}, http.StatusInternalServerError)
+            return
+        }
+        utils.JSONResponse(w, config.Response{Message: "User registered successfully"}, http.StatusCreated)
 	}
 }
