@@ -8,6 +8,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql" // Import MySQL driver
 	"github.com/joho/godotenv"
+	"github.com/nadeem-baig/go-auth/cmd/api"
 	"github.com/nadeem-baig/go-auth/utils/logger"
 )
 
@@ -44,7 +45,10 @@ func main() {
 
     // Ping to verify connection
     err = db.Ping()
-    logger.Fatal("Failed to ping database", err)
+    if err!= nil {
+        logger.Fatal("Failed to ping database", err)
+    }
 
     log.Println("Successfully connected to the database")
+    api.StartServer(db)
 }

@@ -1,0 +1,6 @@
+# .air.toml
+
+[build]
+bin = "bin/dist" # Output binary location
+cmd = "go build -o ./bin/dist ./cmd/main.go" # Build command
+full_bin = "bin/dist" # Path to the executable
