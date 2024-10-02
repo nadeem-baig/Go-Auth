@@ -10,6 +10,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/nadeem-baig/go-auth/config"
+	"github.com/nadeem-baig/go-auth/service/product"
 	"github.com/nadeem-baig/go-auth/service/user"
 	// "github.com/nadeem-baig/go-auth/service/post"
 	// "github.com/nadeem-baig/go-auth/service/payment"
@@ -27,13 +28,13 @@ func StartServer(db *sql.DB) {
 
 	// Initialize service handlers
 	userAuthHandler := user.NewHandler(mainHandler)
-	// postHandler := post.NewHandler(mainHandler)
-	// paymentHandler := payment.NewHandler(mainHandler)
+	productHandler := product.NewHandler(mainHandler)
+
 
 	// Mount service handlers
 	mainHandler.Mux.Handle("/api/v1/users/auth/", http.StripPrefix("/api/v1/users/auth", userAuthHandler))
-	// mainHandler.Mux.Handle("/api/v1/posts/", http.StripPrefix("/api/v1/posts", postHandler))
-	// mainHandler.Mux.Handle("/api/v1/payments/", http.StripPrefix("/api/v1/payments", paymentHandler))
+	mainHandler.Mux.Handle("/api/v1/products/", http.StripPrefix("/api/v1/products", productHandler))
+
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%s", port),

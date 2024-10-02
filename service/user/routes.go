@@ -4,13 +4,9 @@ import (
 	"net/http"
 
 	"github.com/nadeem-baig/go-auth/config"
-	"github.com/nadeem-baig/go-auth/middleware"
-	"github.com/nadeem-baig/go-auth/types"
+	. "github.com/nadeem-baig/go-auth/middleware"
 )
 
-type Handler struct {
-	store *types.UserStore
-}
 
 
 // NewHandler initializes a new router with defined routes for user service.
@@ -18,8 +14,8 @@ func NewHandler(h *config.Handler) http.Handler {
 	mux := http.NewServeMux()
 	store := NewStore(h.DB)
 
-	mux.HandleFunc("/", middleware.LoggingMiddleware(HomeHandler(h)))
-	mux.HandleFunc("/login", middleware.LoggingMiddleware(LoginHandler(h, store)))
-	mux.HandleFunc("/register", middleware.LoggingMiddleware(RegisterHandler(h, store)))
+	mux.Handle("/", LoggingMiddleware(MethodHandler(http.MethodGet, HomeHandler(h))))
+	mux.Handle("/login", LoggingMiddleware(MethodHandler(http.MethodPost, LoginHandler(h, store))))
+	mux.Handle("/register", LoggingMiddleware(MethodHandler(http.MethodPost, RegisterHandler(h, store))))
 	return mux
 }
