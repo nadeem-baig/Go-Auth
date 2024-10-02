@@ -19,7 +19,7 @@ func NewHandler(h *config.Handler) http.Handler {
 	store := NewStore(h.DB)
 
 	mux.HandleFunc("/", middleware.LoggingMiddleware(HomeHandler(h)))
-	mux.HandleFunc("/login", middleware.LoggingMiddleware(GreetHandler(h)))
+	mux.HandleFunc("/login", middleware.LoggingMiddleware(LoginHandler(h, store)))
 	mux.HandleFunc("/register", middleware.LoggingMiddleware(RegisterHandler(h, store)))
 	return mux
 }

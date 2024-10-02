@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/nadeem-baig/go-auth/utils/logger"
@@ -24,3 +25,12 @@ func ParseJson(r *http.Request, payload any) error {
 }
 
 var Validate = validator.New()
+
+
+// Helper function to get environment variable as a string with fallback
+func GetEnv(key string, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
+}

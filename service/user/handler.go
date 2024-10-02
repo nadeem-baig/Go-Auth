@@ -68,3 +68,40 @@ func RegisterHandler(h *config.Handler, store UserStore) http.HandlerFunc {
         utils.JSONResponse(w, config.Response{Message: "User registered successfully"}, http.StatusCreated)
 	}
 }
+
+// RegisterHandler processes JSON input data and responds.
+func LoginHandler(h *config.Handler, store UserStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var payload types.LoginUserPayload
+
+		// Validate and parse JSON request payload
+		if err := utils.ParseJson(r, &payload); err != nil {
+			utils.JSONResponse(w, config.Response{Message: err.Error()}, http.StatusBadRequest)
+			return
+		}
+		// validate payload
+		if err := utils.Validate.Struct(payload); err != nil {
+			utils.JSONResponse(w, config.Response{Message: err.Error()}, http.StatusBadRequest)
+            return
+		}
+
+		u, err := store.GetUserByEmail(payload.Email)
+		if err != nil {
+			utils.JSONResponse(w, config.Response{Message: "Invalid User details"}, http.StatusBadRequest)
+			return
+		}
+		
+		if !auth.ComparePassword(u.Password, payload.Password) {
+			utils.JSONResponse(w, config.Response{Message: "Invalid User details"}, http.StatusBadRequest)
+            return
+		}
+		secret := []byte(config.AppConfigs.JWTSecret)
+		token,err := auth.CreateJWT(secret,u.ID)
+		if err!= nil {
+			utils.JSONResponse(w, config.Response{Message:err.Error()}, http.StatusInternalServerError)
+            return        
+		}
+		
+        utils.JSONResponse(w, config.Response{Message: token}, http.StatusCreated)
+	}
+}
