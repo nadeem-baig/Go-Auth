@@ -30,7 +30,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // Response is a struct to define the structure of JSON responses.
 type Response struct {
 	Message  string     `json:"message,omitempty"` // Pointer makes it optional, `omitempty` excludes it if nil
-	Response interface{} `json:"response"`          // `interface{}` allows any type
+	Response interface{} `json:"response,omitempty"`          // `interface{}` allows any type
 }
 
 type AppConfig struct {

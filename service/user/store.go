@@ -10,6 +10,7 @@ import (
 type UserStore interface {
 	GetUserByEmail(email string) (*types.User, error)
 	CreateUser(user types.User) error
+	GetUserByID(id string) (*types.User, error)
 }
 
 type Store struct {
@@ -22,6 +23,7 @@ var _ UserStore = (*Store)(nil)
 func NewStore(db *sql.DB) *Store {
 	return &Store{db: db}
 }
+
 
 func (s *Store) GetUserByEmail (email string) (*types.User, error)  {
 	rows,err := s.db.Query("SELECT * FROM users WHERE email = ?",email)

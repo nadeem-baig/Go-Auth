@@ -30,7 +30,7 @@ func RegisterHandler(h *config.Handler, store UserStore) http.HandlerFunc {
 		// validate payload
 		if err := utils.Validate.Struct(payload); err != nil {
 			utils.JSONResponse(w, config.Response{Message: err.Error()}, http.StatusBadRequest)
-            return
+			return
 		}
 		// check if user exists
 		_, err := store.GetUserByEmail(payload.Email)
@@ -38,22 +38,22 @@ func RegisterHandler(h *config.Handler, store UserStore) http.HandlerFunc {
 			utils.JSONResponse(w, config.Response{Message: "User already exists"}, http.StatusConflict)
 			return
 		}
-		hashedPassword,err := auth.HashPassword(payload.Password)
-		if err != nil  {
+		hashedPassword, err := auth.HashPassword(payload.Password)
+		if err != nil {
 			logger.Errorf("Failed to hash password")
 		}
 		// create user
 		user := types.User{
-            FirstName: payload.FirstName,
-            LastName:  payload.LastName,
-            Email:     payload.Email,
-            Password: hashedPassword,
-        }
-        if err := store.CreateUser(user); err!= nil {
-            utils.JSONResponse(w, config.Response{Message: err.Error()}, http.StatusInternalServerError)
-            return
-        }
-        utils.JSONResponse(w, config.Response{Message: "User registered successfully"}, http.StatusCreated)
+			FirstName: payload.FirstName,
+			LastName:  payload.LastName,
+			Email:     payload.Email,
+			Password:  hashedPassword,
+		}
+		if err := store.CreateUser(user); err != nil {
+			utils.JSONResponse(w, config.Response{Message: err.Error()}, http.StatusInternalServerError)
+			return
+		}
+		utils.JSONResponse(w, config.Response{Message: "User registered successfully"}, http.StatusCreated)
 	}
 }
 
@@ -70,7 +70,7 @@ func LoginHandler(h *config.Handler, store UserStore) http.HandlerFunc {
 		// validate payload
 		if err := utils.Validate.Struct(payload); err != nil {
 			utils.JSONResponse(w, config.Response{Message: err.Error()}, http.StatusBadRequest)
-            return
+			return
 		}
 
 		u, err := store.GetUserByEmail(payload.Email)
@@ -78,18 +78,18 @@ func LoginHandler(h *config.Handler, store UserStore) http.HandlerFunc {
 			utils.JSONResponse(w, config.Response{Message: "Invalid User details"}, http.StatusBadRequest)
 			return
 		}
-		
+
 		if !auth.ComparePassword(u.Password, payload.Password) {
 			utils.JSONResponse(w, config.Response{Message: "Invalid User details"}, http.StatusBadRequest)
-            return
+			return
 		}
 		secret := []byte(config.AppConfigs.JWTSecret)
-		token,err := auth.CreateJWT(secret,u.ID)
-		if err!= nil {
-			utils.JSONResponse(w, config.Response{Message:err.Error()}, http.StatusInternalServerError)
-            return        
+		token, err := auth.CreateJWT(secret, u.ID)
+		if err != nil {
+			utils.JSONResponse(w, config.Response{Message: err.Error()}, http.StatusInternalServerError)
+			return
 		}
-		
-        utils.JSONResponse(w, config.Response{Message: token}, http.StatusCreated)
+
+		utils.JSONResponse(w, config.Response{Message: token}, http.StatusCreated)
 	}
 }

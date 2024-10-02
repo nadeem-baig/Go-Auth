@@ -14,7 +14,6 @@ type Store struct {
 	db *sql.DB
 }
 
-// Ensure Store implements ProductStore
 var _ ProductStore = (*Store)(nil)
 
 func NewStore(db *sql.DB) *Store {
