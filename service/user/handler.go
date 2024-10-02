@@ -1,7 +1,6 @@
 package user
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/nadeem-baig/go-auth/config"
@@ -15,17 +14,6 @@ import (
 func HomeHandler(h *config.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		utils.JSONResponse(w, config.Response{Message: "Welcome to the Go HTTP API!"}, http.StatusOK)
-	}
-}
-
-// GreetHandler responds with a personalized message based on query param.
-func GreetHandler(h *config.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		name := r.URL.Query().Get("name")
-		if name == "" {
-			name = "World"
-		}
-		utils.JSONResponse(w, config.Response{Message: fmt.Sprintf("Hello, %s!", name)}, http.StatusOK)
 	}
 }
 
